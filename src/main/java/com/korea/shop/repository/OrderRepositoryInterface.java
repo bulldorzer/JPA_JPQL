@@ -2,7 +2,6 @@ package com.korea.shop.repository;
 
 
 
-import com.korea.shop.domain.Member;
 import com.korea.shop.domain.Order;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -93,21 +93,48 @@ public class OrderRepositoryInterface {
 
         // Criteria API를 이용하여 동적 쿼리를 생성하는 도구
         // where, select, join 조건 만들수 있음
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-
         // 결과물이 Order 클래스 형식적인 쿼리를 만듬 = SELECT * FROM orders와 비슷한 역할
-        CriteriaQuery<Order> cq = cb.createQuery(Order.class);
-
         // 쿼리에서 Order 테이블을 기준으로 설정하겟다
         // ROOT<T>란 = CriteriaQuery에서 기준이 되는 테이블을 지정
+        // 엔티티 Order, Member 이너조인
+        // 조인할 테이블 지정
+        // 결과 : SELECT * FROM orders o INNER JOIN member m ON o.memeberid = m.id
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+
+        CriteriaQuery<Order> cq = cb.createQuery(Order.class);
+
         Root<Order> o = cq.from(Order.class);
 
-        // Order, Member 이너조인
-        // 조인할 테이블 지정
-        Join<Object,Object> m = o.join("member", JoinType.INNER);
+        Join<Object,Object> m = o.join("member",JoinType.INNER);
 
-        // 결과 : SELECT * FROM orders o INNER JOIN member m ON o.memeberid = m.id
 
-        return List.of();
+        // 검색 조건을 지정할 리스트
+        List<Predicate> criteria = new ArrayList<>();
+
+
+
+        // 주문 상태 검색
+        // cb.equal(테이블.get(필드명), 값);
+        // where문 조건설정 where status = :status
+        if (orderSearch.getOrderStatus() != null){
+
+            Predicate status = cb.equal(o.get("status"),orderSearch.getOrderStatus());
+            criteria.add(status);
+        }
+
+        // 회원 이름 검색
+        // cb.like(테이블.get(필드명),"%"+ 값 + "%");
+        // where name like "%김%"
+        // Criteria API에서 cb.like와 같은 메서드에서 타입 불일치 오류 발생 가능성 줄임
+        // 조건을 where절에 적용
+        if (StringUtils.hasText(orderSearch.getMemberName())){
+            Predicate name = cb.like(m.<String>get("name"),"%"+orderSearch.getMemberName()+"%");
+            criteria.add(name);
+        }
+
+        cq.where(cb.and(criteria.toArray(new Predicate[criteria.size()])));
+        TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000);
+
+        return query.getResultList();
     }
 }
