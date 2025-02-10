@@ -6,11 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberRepositoryInterface {
+public class MemberRepositoryClass {
     // 1) 엔티티 매니저
     private final EntityManager em;
 
@@ -34,7 +33,7 @@ public class MemberRepositoryInterface {
     }
 
     // 3) 1개 데이터 찾기
-    public Member findById( Long id){
+    public Member findOne( Long id){
 
         // em.find(엔티티 클래스, pk)
         return em.find(Member.class, id);

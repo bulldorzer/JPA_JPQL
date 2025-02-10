@@ -1,6 +1,7 @@
 package com.korea.shop.domain.item;
 
 import com.korea.shop.domain.CategoryItem;
+import com.korea.shop.exception.NotEoughStockException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,4 +28,17 @@ public class Item {
     @OneToMany(mappedBy = "item")
     private List<CategoryItem> categoryItems = new ArrayList<>();
 
+    // 재고증가
+    public void addStack(int qty){
+        this.stockQuantity+=qty;
+    }
+
+    // 재고 감소
+    public void removeStack(int qty) {
+        int restStock = this.stockQuantity-qty;
+        if (restStock<0){
+            throw new NotEoughStockException("need more stock");
+        }
+        this.stockQuantity = restStock;
+    }
 }

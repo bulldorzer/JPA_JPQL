@@ -1,7 +1,6 @@
 package com.korea.shop.repository;
 
 
-import com.korea.shop.domain.Member;
 import com.korea.shop.domain.item.Item;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class ItemRepositoryInterface {
+public class ItemRepositoryClass {
 
     // 1 엔티티 매니저 생성
     private final EntityManager em;
@@ -37,7 +36,7 @@ public class ItemRepositoryInterface {
     }
 
     // 4) 전체 상품 검색 - findAll()
-    public List<Item> finall(){
+    public List<Item> findAll(){
 
         // em.createQuery("jpql", 엔티티클래스);
         // jpql 기본규칙 3개지

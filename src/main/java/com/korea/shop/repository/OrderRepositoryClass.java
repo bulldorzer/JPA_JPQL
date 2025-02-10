@@ -15,7 +15,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class OrderRepositoryInterface {
+public class OrderRepositoryClass {
 
     // 1 엔티티 매니저 생성
     private final EntityManager em;
