@@ -24,6 +24,7 @@ public class OrderItem {
     @JoinColumn(name="order_id")
     private Order order;
 
+    // 어느 주문서(큰틀) 에 무슨 상품을 무슨가격에 얼마나 등록할것이냐
     public static OrderItem createOrderItem(Order order, Item item, int orderPrice, int qty){
         OrderItem orderItem = new OrderItem();
 
@@ -38,7 +39,7 @@ public class OrderItem {
 
 
     // 주문 취소 - 재고 다시 더하기
-    public void cancle(){
+    public void cancel(){
         getItem().addStack(qty);
     }
 
