@@ -52,7 +52,7 @@ public class OrderService {
 
     // 주문서에
     // 주문서에 주문 아이템 추가
-    public OrderItem addOrderItem(Long orderId, Long itemId, int price, int qty){
+    public OrderItem addOrderItem(Long orderId, Long itemId,  int qty){
 
         Order order = orderRepository.findOne(orderId); // 주문서 불러오기
         if (order == null){
@@ -63,6 +63,12 @@ public class OrderService {
         if (item == null){
             throw new IllegalArgumentException("해당 상품 없음");
         }
+        
+        // 쿠폰 또는 할인율 적용하는 로직
+        /*double discountRatio = 0.1;
+        int price = discountRatio!= 0 ? (int)Math.floor(item.getPrice() * discountRatio) : item.getPrice() ;*/
+
+        int price = item.getPrice();
         OrderItem orderItem = OrderItem.createOrderItem(order, item, price, qty);
 
         return orderItemRepository.save(orderItem);
@@ -99,7 +105,8 @@ public class OrderService {
             orderItem.cancel();
         }
 
-        
-        orderItemRepository.deleteByOrderId(order);
+        // 주문서 삭제는 경우에 따라 다르다 보통 주문 취소도 리스트로 남아 있음
+        // 쿠팡) 주문서 삭제 누르면 삭제 됨
+//        orderItemRepository.deleteByOrderId(order);
     }
 }

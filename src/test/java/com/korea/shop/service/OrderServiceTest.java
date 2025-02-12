@@ -98,10 +98,38 @@ public class OrderServiceTest {
     @Test
     public void 부분취소() throws Exception{
         // given
+        Member member = createMember();
+
+        Book item1 = createBook("JAVA Spring",10000,10);
+        Book item2 = createBook("React",11000,10);
+
+        int orderQty=2;// 주문수량
+        Long orderId = orderService.order(member.getId());
+
+        OrderItem orderItem1 = orderService.addOrderItem(orderId,item1.getId(),item1.getPrice(),orderQty);
+        OrderItem orderItem2 = orderService.addOrderItem(orderId,item2.getId(),item2.getPrice(),orderQty);
+
 
         // when
+        // 주문서 부분 취소
+        orderService.removeOrderItem(orderItem1.getId());
 
         // then
+        Order getOrder = orderRepository.findOne(orderId); // 주문서 다시 검색
+        List<OrderItem> orderItemList = orderItemRepository.findByOrderId(orderId); // 아이템 리스트
+        int totalPrice = orderItemList.stream().mapToInt(OrderItem::getTotalPrice).sum();
+
+        // 주문한 아이템 갯수
+        assertEquals(1, orderItemList.size());
+        // 삭제된 아이템의 재고가 복구 되었는가?
+        assertEquals(10, item1.getStockQuantity()); // 2개주문
+        // 두번째 아이템 재고는 그대로
+        assertEquals(8, item2.getStockQuantity()); // 2개주문
+
+        System.out.println("현재 주문서 아이템 갯수 : "+ orderItemList.size());
+        System.out.println("전체금액 : "+ totalPrice);
+        System.out.println("아이템1 재고 : "+item1.getStockQuantity());
+        System.out.println("아이템2 재고 : "+item2.getStockQuantity());
     }
     // 전체취소
     @Test
@@ -114,18 +142,17 @@ public class OrderServiceTest {
         OrderItem orderItem = orderService.addOrderItem(orderId,item.getId(),item.getPrice(),orderQty);
         // when
         // 주문서 취소
-        System.out.println("order_id : "+orderId);
         orderService.removeAllOrderItems(orderId);
-
 
         // then
         Order getOrder = orderRepository.findOne(orderId);
+        System.out.println("order_id : "+orderId);
         // 재고수량 증가
-        assertEquals(OrderStatus.CANCEL,getOrder.getStatus(),"주문 상태 확인");
-        assertEquals(OrderStatus.CANCEL,getOrder.getStatus(),"주문 상태 확인");
+        assertEquals(10,item.getStockQuantity(),"아이템 갯수 확인");
 
 
         // 상태 체크 - OrderStatus가 cancel인 상태 체크
+        assertEquals(OrderStatus.CANCEL,getOrder.getStatus(),"주문 상태 확인");
 
     }
 

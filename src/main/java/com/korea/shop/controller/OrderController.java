@@ -13,21 +13,21 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
 
     private final OrderService orderService;
 
     // 주문서에 아이템 추가
+    // /api/orders/{주문서번호}/items
     @PostMapping("/{orderId}/items")
     public ResponseEntity<OrderItem> addOrderItem(
             @PathVariable Long orderId,
             @RequestParam Long itemId,
-            @RequestParam int price,
             @RequestParam int qty
     ){
 
-        OrderItem orderItem = orderService.addOrderItem(orderId,itemId,price,qty);
+        OrderItem orderItem = orderService.addOrderItem(orderId,itemId,qty);
 
         return ResponseEntity.ok(orderItem);
     }
