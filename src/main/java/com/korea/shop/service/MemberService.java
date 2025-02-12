@@ -1,15 +1,12 @@
 package com.korea.shop.service;
 
 import com.korea.shop.domain.Member;
-import com.korea.shop.repository.MemberRepository;
 import com.korea.shop.repository.MemberRepositoryClass;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

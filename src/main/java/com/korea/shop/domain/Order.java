@@ -19,11 +19,11 @@ public class Order {
     @JoinColumn(name = "member_id") // 외래키 필드이름
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "delivery_id") // 양방향일 경우 - 연결관계 주인 설정
     private Delivery delivery; // 배송정보
-    
-    public LocalDateTime orderDate; // 주문시간
+
+    private LocalDateTime orderDate; // 주문시간
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status; // [ORDER, CANCEL]
@@ -40,12 +40,12 @@ public class Order {
         return order;
     }
 
-    private void setOrderDate(LocalDateTime orderDate) {
+    public void setOrderDate(LocalDateTime orderDate) {
         this.orderDate = orderDate;
     }
 
     // 주문취소 상태 변경
-    private void cancel() {
+    public void cancel() {
         if (delivery.getStatus() == DeliveryStatus.COMP){
             throw new IllegalArgumentException("이미 배송완료된 상품은 취소가 불가능 합니다.");
         }

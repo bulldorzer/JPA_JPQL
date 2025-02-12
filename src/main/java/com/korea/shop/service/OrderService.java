@@ -3,12 +3,14 @@ package com.korea.shop.service;
 import com.korea.shop.domain.*;
 import com.korea.shop.domain.item.Item;
 import com.korea.shop.repository.ItemRepositoryClass;
+import com.korea.shop.repository.MemberRepositoryClass;
 import com.korea.shop.repository.OrderItemRepositoryClass;
 import com.korea.shop.repository.OrderRepositoryClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,6 +21,34 @@ public class OrderService {
     private final OrderRepositoryClass orderRepository;
     private final OrderItemRepositoryClass orderItemRepository;
     private final ItemRepositoryClass itemRepository;
+    private final MemberRepositoryClass memberRepository;
+
+
+    // 주문서에 주문서 생성만 순수하게 - 아이템 추가 X
+    public Long order(Long memberId){
+        Order order = new Order();
+        Member member = memberRepository.findOne(memberId);
+
+        // 배송정보 생성
+        Delivery delivery = new Delivery();
+        delivery.setAddress(member.getAddress());
+        delivery.setStatus(DeliveryStatus.READY);
+
+        // 주문서 생성
+        order.setMember(member);
+        order.setDelivery(delivery);
+        order.setStatus(OrderStatus.ORDER);
+        order.setOrderDate(LocalDateTime.now()); // 현재시간 설정
+
+
+        // 주문 저장
+        orderRepository.save(order);
+
+
+
+        return order.getId();
+
+    }
 
     // 주문서에
     // 주문서에 주문 아이템 추가
@@ -60,6 +90,10 @@ public class OrderService {
 
         // 해당 주문서의 모든 아이템
         List<OrderItem> orderItemList = orderItemRepository.findByOrderId(order.getId());
+
+        // 주문 상태 - 취소로 변경
+        order.cancel();
+
         // 재고 복원
         for (OrderItem orderItem : orderItemList){
             orderItem.cancel();
