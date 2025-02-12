@@ -2,6 +2,7 @@ package com.korea.shop.service;
 
 import com.korea.shop.domain.*;
 import com.korea.shop.domain.item.Item;
+import com.korea.shop.dto.OrderDTO;
 import com.korea.shop.repository.ItemRepositoryClass;
 import com.korea.shop.repository.MemberRepositoryClass;
 import com.korea.shop.repository.OrderItemRepositoryClass;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +52,8 @@ public class OrderService {
 
     }
 
+
+
     // 주문서에
     // 주문서에 주문 아이템 추가
     public OrderItem addOrderItem(Long orderId, Long itemId,  int qty){
@@ -72,6 +76,19 @@ public class OrderService {
         OrderItem orderItem = OrderItem.createOrderItem(order, item, price, qty);
 
         return orderItemRepository.save(orderItem);
+    }
+
+    public  List<OrderDTO> findAll_ver1(){
+        List<Order> orders = orderRepository.findAll_ver1();
+        List<OrderDTO> result = orders.stream()
+                .map(o->new OrderDTO(o))
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
+    public  List<OrderDTO> findAll_ver2(){
+        return orderRepository.findAll_ver2();
     }
 
     // 부분 취소 = 주문 아이템 일부삭제

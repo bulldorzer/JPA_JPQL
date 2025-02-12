@@ -3,6 +3,7 @@ package com.korea.shop.repository;
 
 
 import com.korea.shop.domain.Order;
+import com.korea.shop.dto.OrderDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
@@ -66,6 +67,77 @@ public class OrderRepositoryClass {
         // em.find(엔티티 클래스, pk)
         return em.find(Order.class, orderId);
     }
+
+    // 주문서 전체 검색
+    public List<Order> findAll_ver1(){
+        /*
+           데이터를 조회할때 관계설정이 되어있는 테이블들의 데이터를 같이 조회하려면
+           N+1 개의 쿼리문이 실행된다.
+           ex) Order를 조회 하려면
+           주문 2개 조회됨
+           Delivery + Member
+
+           해결법 : fetch Join
+           한번의 SQL로 모든 연관 엔티티 조회하도록 함 JPQL구문
+           fetch JOIN을 사용하게 되면 Lazy 전략이어도 즉시 함께 조회된다,
+           @EntityGraph 방법보다 JPQL로 세밀하게 제어가능
+
+           SELECT o.*, m.*, d.* FROM orders o
+           JOIN member m ON o.member_id = m.id
+           JOIN delivery d ON o.delivery_id = d.id;
+        */
+
+        // [Version 1]
+        return em.createQuery(
+                "select o from Order o"
+                + " join fetch o.member m" // 회원 member까지 함께 조회
+                + " join fetch o.delivery d" // 배송 delivery까지 함께 조회
+                , Order.class)
+                .getResultList();
+    }
+
+    /*
+        쿼리 최적화 방법 선택 가이드
+        먼저 엔티티 조회후 DTO로 변환하는 방식 사용(ver1)
+        -> 유지보수성과 재사용성이 좋음
+        -> fetch join을 활용하여 성능 최적화
+        -> 대부분의 성능이슈가 해결됨
+        
+        그래도 성능이 부족하면 DTO를 직접 조회 (ver2)
+        -> 네트워크 성능을 최적화 할수 있음
+        
+        최후의 방법으로 네이티브 SQL 또는 스프링 JDBC 사용도 있음
+        -> 성능이 매우 중요한경우 SQL 직접 작성
+    */
+
+    // DTO로 같이 변환
+    public List<OrderDTO> findAll_ver2(){
+        /*
+           데이터를 조회할때 관계설정이 되어있는 테이블들의 데이터를 같이 조회하려면
+           N+1 개의 쿼리문이 실행된다.
+           ex) Order를 조회 하려면
+           주문 2개 조회됨
+           Delivery + Member
+
+           해결법 : fetch Join
+           한번의 SQL로 모든 연관 엔티티 조회하도록 함 JPQL구문
+           fetch JOIN을 사용하게 되면 Lazy 전략이어도 즉시 함께 조회된다,
+           @EntityGraph 방법보다 JPQL로 세밀하게 제어가능
+
+           SELECT o.*, m.*, d.* FROM orders o
+           JOIN member m ON o.member_id = m.id
+           JOIN delivery d ON o.delivery_id = d.id;
+        */
+        // [Version 2]
+        return em.createQuery("select new com.korea.shop.dto.OrderDTO("
+                + "o.id, m.name, o.orderDate, o.status, d.address)"
+                + " from Order o"
+                + " join o.member m"
+                + " join o.delivery d"
+                , OrderDTO.class)
+                .getResultList();
+    }
+
 
     // 주문서 검색 방식 1 JPQL
     public List<Order> findAllByString(OrderSearch orderSearch){

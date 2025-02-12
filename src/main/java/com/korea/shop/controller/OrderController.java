@@ -2,6 +2,8 @@ package com.korea.shop.controller;
 
 
 import com.korea.shop.domain.OrderItem;
+import com.korea.shop.dto.OrderDTO;
+import com.korea.shop.repository.OrderRepositoryClass;
 import com.korea.shop.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -17,6 +20,20 @@ import java.util.Map;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderRepositoryClass orderRepository;
+
+    // API에서 데이터 요청들어오면 리포지토리 -> 엔티티 -> DTO변환해서 리턴해줘야함
+    // 엔티티를 dto로 변환해서 내보내는 이유?
+    // 1) 무한루프 문제 - Lazy loading & 양방향 연관관계일 경우
+    // 2) Lazy loading 성능 문제( = sql 여러번 실행) = fetch join 해결
+    // 3) api 응답시 엔티티가 영향을 받을 수 있음
+    // 엔티티와 요청한 데이터가 다름 - 요청한 것에 맞춰 엔티티를 수정해야 하는 상황이 생김
+    // DTO를 사용하여 엔티티와 API 응답을 분리함
+    // 주문서 전체 조회
+    @GetMapping("/orders")
+    public List<OrderDTO> orders(){
+        return orderService.findAll_ver1();
+    }
 
     // 주문서에 아이템 추가
     // /api/orders/{주문서번호}/items
