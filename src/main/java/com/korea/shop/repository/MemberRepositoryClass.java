@@ -4,6 +4,7 @@ import com.korea.shop.domain.Member;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class MemberRepositoryClass {
     private final EntityManager em;
 
     // 2) 신규 생성(저장), 업데이트(수정)
+    @Transactional
     public void save(Member member){
 
         Long id = member.getId();

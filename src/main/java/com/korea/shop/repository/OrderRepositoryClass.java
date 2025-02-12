@@ -24,7 +24,6 @@ public class OrderRepositoryClass {
     *   - find(엔티티.class,pk) : 1개 찾기
     *   - merge(객체) : 존재0 - 수정 존재X - 생성
     *   - remove(객체) : 해당 데이터 삭제
-    *   - executeUpdate()
     *
     *   [쿼리생성]
     *   - createQuery("jpql구문", 엔티티.class) - 쿼리발생
@@ -61,11 +60,11 @@ public class OrderRepositoryClass {
         }
     }
 
-    // 3) 상품 id 기준으로 검색
-    public Order findOne(Long id){
+    // 3) orderId 기준으로  주문서 검색
+    public Order findOne(Long orderId){
 
         // em.find(엔티티 클래스, pk)
-        return em.find(Order.class, id);
+        return em.find(Order.class, orderId);
     }
 
     // 주문서 검색 방식 1 JPQL

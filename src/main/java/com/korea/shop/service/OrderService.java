@@ -39,8 +39,11 @@ public class OrderService {
     }
 
     // 부분 취소 = 주문 아이템 일부삭제
-    public void removeOrderItem(OrderItem orderItem){
-        
+    public void removeOrderItem(Long orderItemId){
+
+        // orderItemId 가지고 해당하는 orderItem객체 찾기
+        OrderItem orderItem = orderItemRepository.findOne(orderItemId);
+
         //재고 복원
         orderItem.cancel();
         

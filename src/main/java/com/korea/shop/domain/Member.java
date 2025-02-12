@@ -16,6 +16,8 @@ public class Member {
     private Long id;
 
     private String name;
+    private String email;
+    private String pw;
 
     @Embedded // 값 타입 포함
     private Address address;
